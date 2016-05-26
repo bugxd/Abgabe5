@@ -33,37 +33,10 @@ public class CertToolsImpl implements CertTools {
 					certificates.add((X509Certificate) cert);
 				}
 			}
-
-
-			for (Certificate cert : certificates) {
-				System.out.println("Certificate is: " + cert);
-				if(cert instanceof X509Certificate) {
-					try {
-						( (X509Certificate) cert).checkValidity();
-						System.out.println("Certificate is active for current date");
-					} catch(CertificateExpiredException cee) {
-						System.out.println("Certificate is expired");
-					}
-				}
-			}
 		}
 		catch (Exception e){
 			e.printStackTrace();
 		}
-
-
-
-
-		/*try{
-			URL httpsURL = new URL(host);
-			HttpsURLConnection connection = (HttpsURLConnection) httpsURL.openConnection();
-			connection.connect();
-			this.certificates = connection.getServerCertificates();
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			return false;
-		}*/
 
 		return true;
 	}
