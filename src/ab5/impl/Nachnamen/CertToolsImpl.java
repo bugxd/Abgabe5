@@ -2,6 +2,7 @@ package ab5.impl.Nachnamen;
 
 import java.net.URL;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.X509Certificate;
@@ -36,6 +37,7 @@ public class CertToolsImpl implements CertTools {
 		}
 		catch (Exception e){
 			e.printStackTrace();
+			return false;
 		}
 
 		return true;
@@ -43,8 +45,7 @@ public class CertToolsImpl implements CertTools {
 
 	@Override
 	public void setCerts(Set<X509Certificate> certs) {
-		// TODO Auto-generated method stub
-		
+		certificates = certs;
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class CertToolsImpl implements CertTools {
 	@Override
 	public String getCertRepresentation(int cert) {
 		X509Certificate certificate = (X509Certificate) certificates.toArray()[cert];
-		return null;
+		return certificate.getType();
 	}
 
 	@Override
@@ -104,7 +105,8 @@ public class CertToolsImpl implements CertTools {
 	@Override
 	public String getIssuerSerialNumber(int cert) {
 		X509Certificate certificate = (X509Certificate) certificates.toArray()[cert];
-		return null;
+
+		return certificate.getIssuerUniqueID().toString();
 	}
 
 	@Override
@@ -171,13 +173,21 @@ public class CertToolsImpl implements CertTools {
 
 	@Override
 	public boolean verifyAllCerts() {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			for (X509Certificate cert : certificates) {
+				cert.verify(cert.getPublicKey());
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
 	public int getIsserCertNumber(int cert) {
-		// TODO Auto-generated method stub
+		X509Certificate certificate = (X509Certificate) certificates.toArray()[cert];
 		return 0;
 	}
 
