@@ -4,11 +4,10 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import ab5.CertTools;
 
@@ -16,12 +15,30 @@ import javax.net.SocketFactory;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+import javax.xml.bind.DatatypeConverter;
 
 public class CertToolsImpl implements CertTools {
 	private Set<X509Certificate> certificates;
 
 	@Override
 	public boolean loadServerCerts(String host, Integer port){
+		certificates = new HashSet<>();
+
+		/*try{
+			URL httpsURL = new URL("https://campus.aau.at/");
+			HttpsURLConnection connection = (HttpsURLConnection) httpsURL.openConnection();
+			connection.connect();
+			Certificate[] certs = connection.getServerCertificates();
+			for (Certificate cert : certs) {
+				if(cert instanceof X509Certificate) {
+					certificates.add((X509Certificate) cert);
+				}
+			}
+		}
+		catch (Exception ex){
+			ex.printStackTrace();
+			return false;
+		}*/
 
 		try{
 			SocketFactory factory = SSLSocketFactory.getDefault();
@@ -43,6 +60,11 @@ public class CertToolsImpl implements CertTools {
 		return true;
 	}
 
+	public void PrintCert(int cert){
+		X509Certificate certificate = (X509Certificate) certificates.toArray()[cert];
+		System.out.print(certificate.toString());
+	}
+
 	@Override
 	public void setCerts(Set<X509Certificate> certs) {
 		certificates = certs;
@@ -56,7 +78,14 @@ public class CertToolsImpl implements CertTools {
 	@Override
 	public String getCertRepresentation(int cert) {
 		X509Certificate certificate = (X509Certificate) certificates.toArray()[cert];
-		return certificate.getType();
+
+
+		try {
+			return DatatypeConverter.printBase64Binary(certificate.getEncoded()); // .replaceAll("(.{64})", "$1\n") für Base64 spezifikation
+		} catch (CertificateEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -193,7 +222,6 @@ public class CertToolsImpl implements CertTools {
 
 	@Override
 	public List<Integer> getCertificateChain() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
